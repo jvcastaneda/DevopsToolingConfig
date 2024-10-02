@@ -32,14 +32,6 @@ prometheus:
       - name: "alertmanager-main"
         namespace: "prometheus"
         port: "web"
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: gp2
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
 
 # Configure Alertmanager instance
 alertmanager:
@@ -50,14 +42,6 @@ alertmanager:
         memory: "1024Mi"
         cpu: "800m"
     externalUrl: "http://alertmanager.example.com"
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: gp2
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
 
 # Configure Grafana instance
 grafana:
