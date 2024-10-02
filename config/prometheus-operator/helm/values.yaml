@@ -1,0 +1,98 @@
+# values.yaml
+
+# Enable the Prometheus Operator
+prometheusOperator:
+  enabled: true
+
+# Configure Prometheus instance
+prometheus:
+  enabled: true
+  additionalPrometheusRules:
+    enabled: true
+    selector:
+      matchLabels:
+        prometheus: rules
+  prometheusSpec:
+    ruleselector:
+      matchLabels:
+        prometheus: rules
+    retention: "10d" # How long to keep data
+    resources:
+      requests:
+        memory: "400Mi"
+        cpu: "200m"
+    serviceMonitorSelector:
+      matchLabels:
+        team: frontend
+    podMonitorSelector:
+      matchLabels:
+        team: frontend
+    alerting:
+      alertmanagers:
+      - name: "alertmanager-main"
+        namespace: "prometheus"
+        port: "web"
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+# Configure Alertmanager instance
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "800m"
+    externalUrl: "http://alertmanager.example.com"
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+# Configure Grafana instance
+grafana:
+  enabled: true
+  adminPassword: "admin" # Default admin password for Grafana
+  sidecar:
+    dashboards:
+      enabled: true
+    datasources:
+      enabled: true
+  service:
+    type: LoadBalancer
+  persistence:
+    enabled: true
+    storageClassName: gp2
+    accessModes:
+    - ReadWriteOnce
+    size: 5Gi
+    finalizers:
+    - kubernetes.io/pvc-protection
+
+# Configure ServiceMonitor
+serviceMonitor:
+  enabled: true
+
+# Configure PodMonitor
+podMonitor:
+  enabled: true
+
+# Set up the namespace for all resources
+namespace:
+  name: "prometheus"
+
+# Specify whether to create CRDs (Custom Resource Definitions)
+createCustomResourceDefinitions: true
+
+# Set the version of the Prometheus Operator chart
+version: "17.0.0" # Change according to the chart version you need
