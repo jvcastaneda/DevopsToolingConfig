@@ -7,15 +7,6 @@ prometheusOperator:
 # Configure Prometheus instance
 prometheus:
   enabled: true
-  additionalPrometheusRules:
-    enabled: true
-    selector:
-      matchLabels:
-        prometheus: rules
-  prometheusSpec:
-    ruleselector:
-      matchLabels:
-        prometheus: rules
     retention: "10d" # How long to keep data
     resources:
       requests:
