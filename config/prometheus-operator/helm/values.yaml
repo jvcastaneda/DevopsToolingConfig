@@ -64,3 +64,12 @@ createCustomResourceDefinitions: true
 
 # Set the version of the Prometheus Operator chart
 version: "17.0.0" # Change according to the chart version you need
+
+# adding custom alert and recording rules
+additionalPrometheusRulesMap:
+  custom-alert-rules:
+    groups:
+      - name: CdnRateOfRequests.rules
+        rules:
+          - record: cdnrateofrequests:rate5m
+            expr: (increase(r_httpstatuscountbycdn_sre[5m]))
