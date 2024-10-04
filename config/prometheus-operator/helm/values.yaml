@@ -67,9 +67,14 @@ version: "17.0.0" # Change according to the chart version you need
 
 # adding custom alert and recording rules
 additionalPrometheusRulesMap:
-  custom-alert-rules:
-    groups:
-      - name: CdnRateOfRequests.rules
-        rules:
-          - record: cdnrateofrequests:rate5m
-            expr: (increase(r_httpstatuscountbycdn_sre[5m]))
+  groups:
+    - name: InfraBoomiInstanceDown.rules
+      rules:
+        - alert: InfraInstanceDown
+          expr: up{instance=~"(?i).*boomi.*"} == 0
+          for: 15m
+          labels:
+            severity: bus-critical
+          annotations:
+            description: 'Server: {{ $labels.instance }} in Env: {{ $labels.job }} is not reachable from Prometheus for last 15 minutes.'
+            summary: 'Server: {{ $labels.instance }} is not reachable from Prometheus'
