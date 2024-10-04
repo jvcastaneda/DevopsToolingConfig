@@ -7,6 +7,7 @@ prometheusOperator:
 # Configure Prometheus instance
 prometheus:
   enabled: true
+  prometheusSpec:
     retention: "10d" # How long to keep data
     resources:
       requests:
