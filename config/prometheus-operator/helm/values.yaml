@@ -11,8 +11,8 @@ prometheus:
     retention: "10d" # How long to keep data
     resources:
       requests:
-        memory: "400Mi"
-        cpu: "200m"
+        memory: "500Mi"
+        cpu: "300m"
     serviceMonitorSelector:
       matchLabels:
         team: frontend
