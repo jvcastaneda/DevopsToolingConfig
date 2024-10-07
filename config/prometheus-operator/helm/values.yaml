@@ -21,9 +21,9 @@ prometheus:
         team: frontend
     alerting:
       alertmanagers:
-        - name: "alertmanager-main"
-          namespace: "prometheus"
-          port: "web"
+      - name: "alertmanager-main"
+        namespace: "prometheus"
+        port: "web"
 
 # Configure Alertmanager instance
 alertmanager:
@@ -68,14 +68,14 @@ version: "17.0.0" # Change according to the chart version you need
 # adding custom alert and recording rules
 additionalPrometheusRulesMap:
   custom-alert-rules:
-  groups:
-    - name: InfraBoomiInstanceDown.rules
+    groups:
+    - name: custom-node-alerts
       rules:
-        - alert: InfraInstanceDown
-          expr: up{instance=~"(?i).*boomi.*"} == 0
-          for: 15m
-          labels:
-            severity: bus-critical
-          annotations:
-            description: "Server: {{ $labels.instance }} in Env: {{ $labels.job }} is not reachable from Prometheus for last 15 minutes."
-            summary: "Server: {{ $labels.instance }} is not reachable from Prometheus"
+      - alert: HighMemoryUsage
+        expr: node_memory_Active_bytes / node_memory_MemTotal_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage on node"
+          description: "Memory usage on the node is above 90%."
