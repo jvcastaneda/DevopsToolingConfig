@@ -16,13 +16,14 @@ usage() {
     exit 1
 }
 
-# Check if the script is run with an argument
-if [ $# -ne 1 ]; then
-    usage
-fi
+# Set default action if no argument is provided
+DEFAULT_ACTION="init"
+
+# Check if the script is run with an argument, otherwise use default
+ACTION=${1:-$DEFAULT_ACTION}
 
 # Check the argument and set the appropriate action
-case $1 in
+case $ACTION in
     init)
         ACTION="init"
         ;;
@@ -51,21 +52,15 @@ if [ "$ACTION" == "init" ]; then
     # Enable the Prometheus Node Exporter
     sudo systemctl enable prometheus-node-exporter
     check_exit_status "Failed to enable prometheus-node-exporter"
-
-    # Check the status of the Prometheus Node Exporter
-    sudo systemctl status prometheus-node-exporter
-    check_exit_status "Failed to check the status of prometheus-node-exporter"
-
-    # Check the version of the Prometheus Node Exporter
-    prometheus-node-exporter --version
-    check_exit_status "Failed to check the version of prometheus-node-exporter"
-
-    # Check the Prometheus Node Exporter configuration
-    cat /etc/default/prometheus-node-exporter
-    check_exit_status "Failed to check the configuration of prometheus-node-exporter"
+    
 elif [ "$ACTION" == "upgrade" ]; then
     # Add upgrade logic here
-    echo "Upgrade logic not implemented yet"
-    exit 1
-fi
+    sudo apt update
+    check_exit_status "Failed to update the system"
 
+    sudo apt list --upgradable | grep prometheus-node-exporter
+    check_exit_status "Failed to check for upgradable packages"
+
+    sudo apt upgrade -y prometheus-node-exporter
+    check_exit_status "Failed to upgrade prometheus-node-exporter"  
+fi
