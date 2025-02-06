@@ -1,6 +1,10 @@
 #!/usr/bin/bash
 
-# Bash script to install Prometheus Node Exporter on a Linux machine (Ubuntu 24.04)
+# Bash script to uninstall Prometheus Node Exporter on a Linux machine (Ubuntu 24.04)
+
+# declare global variables
+package_name="prometheus-node-exporter"
+package_version="1.7.0-1"
 
 # Function to check the exit status of the previous command and return a non-zero exit status with a message
 check_exit_status() {
@@ -11,21 +15,29 @@ check_exit_status() {
 }
 
 # check if prometheus-node-exporter is installed
-prometheus-node-exporter --version
-check_exit_status "prometheus-node-exporter is not installed"
+$package_name --version
+check_exit_status "$package_name is not installed"
 
 # check if prometheus-node-exporter is running
-sudo systemctl status prometheus-node-exporter > /dev/null
-check_exit_status "prometheus-node-exporter is not running"
+sudo systemctl status $package_name > /dev/null
+check_exit_status "$package_name is not running"
+
+# Check if prometheus-node-exporter is on hold
+if sudo apt-mark showhold | grep $package_name; then
+    echo "$package_name is on hold"
+    sudo apt-mark unhold $package_name
+    check_exit_status "Failed to remove $package_name from hold"
+else
+    echo "$package_name is not on hold"
+fi
 
 # Stop the Prometheus Node Exporter
-sudo systemctl stop prometheus-node-exporter
-check_exit_status "Failed to stop prometheus-node-exporter"
+sudo systemctl stop $package_name
+check_exit_status "Failed to stop $package_name"
 
 # Disable the Prometheus Node Exporter
-sudo systemctl disable prometheus-node-exporter
+sudo systemctl disable $package_name
 
 # Uninstall Prometheus Node Exporter
-sudo apt remove -y prometheus-node-exporter
-check_exit_status "Failed to uninstall prometheus-node-exporter"
-
+sudo apt remove -y $package_name
+check_exit_status "Failed to uninstall $package_name"
