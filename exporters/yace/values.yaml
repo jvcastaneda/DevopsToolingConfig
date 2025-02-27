@@ -142,17 +142,18 @@ aws:
 
 serviceMonitor:
   # When set true then use a ServiceMonitor to configure scraping
-  enabled: false
+  enabled: true
   # Set the namespace the ServiceMonitor should be deployed
-  # namespace: monitoring
+  namespace: default
   # Set how frequently Prometheus should scrape
-  # interval: 30s
+  interval: 30s
   # Set path to cloudwatch-exporter telemtery-path
-  # telemetryPath: /metrics
+  telemetryPath: /metrics
   # Set labels for the ServiceMonitor, use this to define your scrape label for Prometheus Operator
-  # labels:
+  labels:
+    release: kube-prometheus-stake
   # Set timeout for scrape
-  # timeout: 10s
+  timeout: 10s
   # Set relabelings for the ServiceMonitor, use to apply to samples before scraping
   # relabelings: []
   # Set metricRelabelings for the ServiceMonitor, use to apply to samples for ingestion
@@ -199,22 +200,35 @@ prometheusRule:
 
 config: |-
   apiVersion: v1alpha1
-  sts-region: us-west-1
-  customNamespace:
-  - name: customEC2Metrics
-    namespace: CustomEC2Metrics
-    regions:
-    - us-west-1
-    metrics:
-    - name: cpu_usage_idle
-      statistics:
-      - Average
-      period: 300
-      length: 300
-      nilToZero: true
-    - name: disk_free
-      statistics:
-      - Average
-      period: 300
-      length: 300
-      nilToZero: true
+  discovery:
+    jobs:
+      - type: AWS/EC2
+        regions:
+          - us-west-1
+        period: 300
+        length: 300
+        metrics:
+          - name: CPUUtilization
+            statistics: [ Average ]
+          - name: NetworkIn
+            statistics: [ Average, Sum ]
+          - name: NetworkOut
+            statistics: [ Average, Sum ]
+          - name: NetworkPacketsIn
+            statistics: [ Sum ]
+          - name: NetworkPacketsOut
+            statistics: [ Sum ]
+          - name: DiskReadBytes
+            statistics: [ Sum ]
+          - name: DiskWriteBytes
+            statistics: [ Sum ]
+          - name: DiskReadOps
+            statistics: [ Sum ]
+          - name: DiskWriteOps
+            statistics: [ Sum ]
+          - name: StatusCheckFailed
+            statistics: [ Sum ]
+          - name: StatusCheckFailed_Instance
+            statistics: [ Sum ]
+          - name: StatusCheckFailed_System
+            statistics: [ Sum ]
