@@ -7,23 +7,12 @@ resource "aws_iam_role" "prometheus_scraper" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/oidc.eks.${var.region}.amazonaws.com/id/${var.oidc_id}"
-        },
-        Action = "sts:AssumeRoleWithWebIdentity",
-        Condition = {
-          StringEquals = {
-            "oidc.eks.${var.region}.amazonaws.com/id/${var.oidc_id}:sub" : "system:serviceaccount:${var.namespace}:${var.service_account_name}"
-          }
+          AWS = "arn:aws:iam::${var.account_id}:role/PrometheusScraperRole"
         }
+        Action = "sts:AssumeRole"
       }
     ]
   })
-  tags = merge(
-    var.tags,
-    {
-      Name = "PrometheusScraperRole"
-    }
-  )
 }
 
 resource "aws_iam_role_policy" "prometheus_scraper_policy" {
@@ -41,8 +30,7 @@ resource "aws_iam_role_policy" "prometheus_scraper_policy" {
           "ec2:DescribeTags",
           "ec2:DescribeRegions",
           "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeNetworkInterfaces",
-          "sts:AssumeRole"
+          "ec2:DescribeNetworkInterfaces"
         ],
         Resource = "*"
       }

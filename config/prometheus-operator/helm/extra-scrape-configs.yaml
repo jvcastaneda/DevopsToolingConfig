@@ -1,0 +1,12 @@
+# extra-scrape-configs.yaml
+- job_name: "ec2-cross-account"
+  ec2_sd_configs:
+  # Account A’s role (the one Prometheus can assume in its own account)
+  - region: us-west-1
+    role_arn: arn:aws:iam::522113394205:role/PrometheusScraperRole
+    port: 9100
+  relabel_configs:
+  - source_labels: [ __meta_ec2_private_ip ]
+    regex: '(.+)'
+    target_label: __address__
+    replacement: '${1}:9100'

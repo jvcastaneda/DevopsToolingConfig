@@ -24,6 +24,9 @@ prometheus:
       - name: "alertmanager-main"
         namespace: "prometheus"
         port: "web"
+    # tell Prometheus Operator to load these extra jobs
+    additionalScrapeConfigs: |
+      {{- .Files.Get "extra-scrape-configs.yaml" | nindent 8 }}
 
 # Configure Alertmanager instance
 alertmanager:
